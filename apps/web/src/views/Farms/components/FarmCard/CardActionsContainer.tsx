@@ -1,16 +1,17 @@
-import { ChainId } from '@pancakeswap/chains'
 import { FarmWithStakedValue } from '@pancakeswap/farms'
 import { useTranslation } from '@pancakeswap/localization'
 import { AtomBox, Button, Flex, RowBetween, Skeleton, Text } from '@pancakeswap/uikit'
 import ConnectWalletButton from 'components/ConnectWalletButton'
-import { useActiveChainId } from 'hooks/useActiveChainId'
-import NextLink from 'next/link'
+import { useStatusViewVeCakeWellSync } from 'components/CrossChainVeCakeModal/hooks/useMultichainVeCakeWellSynced'
+
 import { useMemo } from 'react'
 import { styled, useTheme } from 'styled-components'
 import { StatusView } from 'views/Farms/components/YieldBooster/components/bCakeV3/StatusView'
+import { StatusViewButtons } from 'views/Farms/components/YieldBooster/components/bCakeV3/StatusViewButtons'
 import { useBCakeBoostLimitAndLockInfo } from 'views/Farms/components/YieldBooster/hooks/bCakeV3/useBCakeV3Info'
 import { useBoostStatusPM } from 'views/Farms/components/YieldBooster/hooks/bCakeV3/useBoostStatus'
 import { useWrapperBooster } from 'views/PositionManagers/hooks'
+import { useAccount } from 'wagmi'
 import { useUpdateBCakeFarms } from '../../hooks/useUpdateBCake'
 import { HarvestActionContainer } from '../FarmTable/Actions/HarvestAction'
 import { StakedContainer } from '../FarmTable/Actions/StakedAction'
@@ -74,7 +75,8 @@ const CardActions: React.FC<React.PropsWithChildren<FarmCardActionsProps>> = ({
   )
   const { onUpdate } = useUpdateBCakeFarms(bCakeWrapperAddress ?? '0x', pid)
   const { locked } = useBCakeBoostLimitAndLockInfo()
-  const { chainId } = useActiveChainId()
+  const { chainId } = useAccount()
+  const { isVeCakeWillSync } = useStatusViewVeCakeWellSync(chainId)
 
   return (
     <AtomBox mt="16px">
@@ -131,7 +133,7 @@ const CardActions: React.FC<React.PropsWithChildren<FarmCardActionsProps>> = ({
             </RowBetween>
           </>
         )}
-        {isBooster && chainId === ChainId.BSC && (
+        {isBooster && (
           <>
             <AtomBox
               width={{
@@ -150,16 +152,14 @@ const CardActions: React.FC<React.PropsWithChildren<FarmCardActionsProps>> = ({
                   shouldUpdate={shouldUpdate && farm?.bCakeUserData?.stakedBalance?.gt(0)}
                   expectMultiplier={veCakeUserMultiplierBeforeBoosted}
                 />
-                {!locked && (
-                  <NextLink href="/cake-staking" passHref>
-                    <Button width="100%" style={{ whiteSpace: 'nowrap' }}>
-                      {t('Go to Lock')}
-                    </Button>
-                  </NextLink>
-                )}
-                {shouldUpdate && farm?.bCakeUserData?.stakedBalance?.gt(0) && (
-                  <Button onClick={onUpdate}>{t('Update')}</Button>
-                )}
+                <StatusViewButtons
+                  locked={locked}
+                  updateButton={
+                    shouldUpdate && farm?.bCakeUserData?.stakedBalance?.gt(0) ? (
+                      <Button onClick={onUpdate}>{t('Update')}</Button>
+                    ) : null
+                  }
+                />
               </Flex>
             </RowBetween>
           </>
