@@ -6,7 +6,6 @@ export interface ExtendEthereum extends WindowProvider {
   isBlocto?: true
   isMathWallet?: true
   isTrustWallet?: true
-  isBlocto?: true
   isBinance?: true
   isCoinbaseWallet?: true
   isTrust?: true
@@ -27,6 +26,7 @@ declare global {
       bnbSign?: (address: string, message: string) => Promise<{ publicKey: string; signature: string }>
       switchNetwork?: (networkId: string) => Promise<string>
     } & Ethereum
+    Telegram?: any
   }
 }
 
