@@ -105,6 +105,8 @@ interface RoundResultBoxProps {
   isNext?: boolean
   isLive?: boolean
   hasEntered?: boolean
+
+  innerPadding?: string | null
 }
 
 const getBackgroundColor = ({
@@ -140,22 +142,23 @@ const Background = styled(Box)<RoundResultBoxProps>`
   padding: 2px;
 `
 
-const StyledRoundResultBox = styled.div`
+const StyledRoundResultBox = styled.div<{ $padding?: string }>`
   background: ${({ theme }) => theme.card.background};
   border-radius: 14px;
-  padding: 16px;
+  padding: ${({ $padding }) => $padding || '16px'};
 `
 
 export const RoundResultBox: React.FC<React.PropsWithChildren<RoundResultBoxProps>> = ({
   isNext = false,
   hasEntered = false,
   isLive = false,
+  innerPadding = '',
   children,
   ...props
 }) => {
   return (
     <Background isNext={isNext} hasEntered={hasEntered} isLive={isLive} {...props}>
-      <StyledRoundResultBox>{children}</StyledRoundResultBox>
+      <StyledRoundResultBox $padding={innerPadding || ''}>{children}</StyledRoundResultBox>
     </Background>
   )
 }
@@ -167,7 +170,7 @@ interface RoundPriceProps {
 
 export const RoundPrice: React.FC<React.PropsWithChildren<RoundPriceProps>> = ({ lockPrice, closePrice }) => {
   const config = useConfig()
-  const betPosition = getRoundPosition(lockPrice, closePrice)
+  const betPosition = getRoundPosition(lockPrice, closePrice) // Only need to show UP/DOWN and not related to AI bet
   const priceDifference = getPriceDifference(closePrice, lockPrice)
 
   const textColor = useMemo(() => {
@@ -186,14 +189,20 @@ export const RoundPrice: React.FC<React.PropsWithChildren<RoundPriceProps>> = ({
     <Flex alignItems="center" justifyContent="space-between" mb="16px">
       {closePrice ? (
         <Text color={textColor} bold fontSize="24px">
-          {formatUsd(Number(formatBigInt(closePrice, 8, 8)), config?.displayedDecimals ?? 0)}
+          {formatUsd(
+            Number(formatBigInt(closePrice, 8, 8)),
+            config?.livePriceDecimals ?? config?.displayedDecimals ?? 0,
+          )}
         </Text>
       ) : (
         <Skeleton height="34px" my="1px" />
       )}
       {betPosition && (
         <PositionTag betPosition={betPosition}>
-          {formatUsd(Number(formatBigInt(priceDifference, 8, 8)), config?.displayedDecimals ?? 0)}
+          {formatUsd(
+            Number(formatBigInt(priceDifference, 8, 8)),
+            config?.livePriceDecimals ?? config?.displayedDecimals ?? 0,
+          )}
         </PositionTag>
       )}
     </Flex>
@@ -248,7 +257,7 @@ export const LockPriceHistoryRow: React.FC<React.PropsWithChildren<LockPriceHist
   return (
     <Row {...props}>
       <Text fontSize="14px">{t('Locked Price')}:</Text>
-      <Text fontSize="14px">{formatUsd(lockPrice, config?.displayedDecimals ?? 0)}</Text>
+      <Text fontSize="14px">{formatUsd(lockPrice, config?.livePriceDecimals ?? config?.displayedDecimals ?? 0)}</Text>
     </Row>
   )
 }

@@ -38,6 +38,14 @@ export interface PredictionConfig {
   displayedDecimals: number
   token: Token
   tokenBackgroundColor: string // For selector svg token for prediction page.
+
+  isAIPrediction?: boolean // AI-based prediction market
+
+  // Decimals to accommodate varying price sources
+  AIPriceDecimals?: number
+  lockPriceDecimals?: number
+  closePriceDecimals?: number
+  livePriceDecimals?: number
 }
 
 export type ContractAddresses<T extends ChainId = SupportedChainId> = {
