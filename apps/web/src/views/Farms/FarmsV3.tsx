@@ -236,7 +236,7 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
       (chainId && supportedChainIdV2.includes(chainId) ? v2UserDataLoaded : true) &&
       (chainId && supportedChainIdV3.includes(chainId) ? v3UserDataLoaded : true))
 
-  const [stakedOnly, setStakedOnly] = useUserFarmStakedOnly(isActive)
+  const [stakedOnly, , toggleStakedOnly] = useUserFarmStakedOnly(isActive)
   const [v3FarmOnly, setV3FarmOnly] = useState(false)
   const [v2FarmOnly, setV2FarmOnly] = useState(false)
   const [boostedOnly, setBoostedOnly] = useState(false)
@@ -322,9 +322,7 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
           (stableSwapOnly && farm.version === 2 && farm.isStable),
       )
 
-      const stakedFilterFarmsWithTypes = getStakedFarms(filterFarmsWithTypes)
-
-      chosenFs = stakedOnly ? farmsList(stakedFilterFarmsWithTypes) : farmsList(filterFarmsWithTypes)
+      chosenFs = farmsList(filterFarmsWithTypes)
     }
 
     return chosenFs
@@ -469,12 +467,7 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
                 handleSetFarmTypesEnableCount={setFarmTypesEnableCount}
               />
               <ToggleWrapper>
-                <Toggle
-                  id="staked-only-farms"
-                  checked={stakedOnly}
-                  onChange={() => setStakedOnly(!stakedOnly)}
-                  scale="sm"
-                />
+                <Toggle id="staked-only-farms" checked={stakedOnly} onChange={toggleStakedOnly} scale="sm" />
                 <Text> {t('Staked only')}</Text>
               </ToggleWrapper>
             </Flex>
@@ -529,16 +522,14 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
                 <Text fontSize={['16px', null, '20px']} color="failure" pr="4px">
                   {t("Don't see the farm you are staking?")}
                 </Text>
-                <Flex>
-                  <FinishedTextLink
-                    external
-                    color="failure"
-                    fontSize={['16px', null, '20px']}
-                    href="https://v1-farms.pancakeswap.finance/farms/history"
-                  >
-                    {t('check out v1 farms')}.
-                  </FinishedTextLink>
-                </Flex>
+                <FinishedTextLink
+                  external
+                  color="failure"
+                  fontSize={['16px', null, '20px']}
+                  href="https://v1-farms.pancakeswap.finance/farms/history"
+                >
+                  {t('check out v1 farms')}.
+                </FinishedTextLink>
               </FinishedTextContainer>
             )}
             {chainId && V2_BCAKE_MIGRATION_SUPPORTED_CHAINS.includes(chainId) && (
@@ -546,11 +537,9 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
                 <Text fontSize={['16px', null, '20px']} color="failure" pr="4px">
                   {t("Don't see the farm you are staking?")}
                 </Text>
-                <Flex>
-                  <FinishedTextLink external color="failure" fontSize={['16px', null, '20px']} href="/migration/bcake">
-                    {t('Migrate to new v2 bCake here')}.
-                  </FinishedTextLink>
-                </Flex>
+                <FinishedTextLink external color="failure" fontSize={['16px', null, '20px']} href="/migration/bcake">
+                  {t('Migrate to new v2 bCake here')}.
+                </FinishedTextLink>
               </FinishedTextContainer>
             )}
             {chainId && V3_MIGRATION_SUPPORTED_CHAINS.includes(chainId) && (
@@ -558,11 +547,9 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
                 <Text fontSize={['16px', null, '20px']} color="failure" pr="4px">
                   {t('Unstaking from v2 farm?')}
                 </Text>
-                <Flex>
-                  <FinishedTextLink external color="failure" fontSize={['16px', null, '20px']} href="/migration">
-                    {t('Migrate to v3 here')}.
-                  </FinishedTextLink>
-                </Flex>
+                <FinishedTextLink external color="failure" fontSize={['16px', null, '20px']} href="/migration">
+                  {t('Migrate to v3 here')}.
+                </FinishedTextLink>
               </FinishedTextContainer>
             )}
           </Box>
